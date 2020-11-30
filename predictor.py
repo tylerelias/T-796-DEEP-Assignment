@@ -297,7 +297,7 @@ class Predictor:
         DROPOUT_VALUE = 0.375
 
         cross_net = model.MyANN(DROPOUT_VALUE, IN_FEATURES, WIDTH, OUT_FEATURES)
-        cross_net.load_state_dict(torch.load('models/nll_network_0911.pt'))
+        cross_net.load_state_dict(torch.load(self.name_))
 
         answers = []
 
