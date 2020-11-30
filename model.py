@@ -20,4 +20,4 @@ class MyANN(nn.Module):
         x = torch.relu(self.dropout(self.fc3(x)))
         x = torch.relu(self.dropout(self.fc4(x)))
         x = self.fc5(x)
-        return nn.functional.log_softmax(x, dim=1)
+        return nn.functional.sigmoid(x)

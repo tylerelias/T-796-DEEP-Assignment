@@ -39,7 +39,7 @@ class Predictor:
         DAY = 2
         QUARTER = 3
         EXPERT_1 = 4
-                # EXPERT_2 index not used, skip
+        # EXPERT_2 index not used, skip
         SENTIMENT = 6
         M1 = 7
         M2 = 8
@@ -52,17 +52,11 @@ class Predictor:
         combined_data = []
 
         # Store the Max value for each data
-        max_stock_price = 0
-        max_day = 0
-        max_sentiment_analysis = 0
-        max_m1 = 0
-        max_m2 = 0
-
-        # The target predictions for the ANN
-        # target_label = []
-
-        # This is used to compare prev. stock price to current one
-        # previous = tuple()
+        max_stock_price = 178.0
+        max_day = 365
+        max_sentiment_analysis = 10
+        max_m1 = 10.0
+        max_m2 = 9994.0
 
         for i in range(len(current_stock_price)):
 
@@ -102,29 +96,6 @@ class Predictor:
                 trend
             )
 
-            # Create a label to use for the model
-            # if previous and previous[STOCK_PRICE] < current_stock_price[i]:
-            #     target_label.append(1)
-            # else:
-            #     target_label.append(0)
-
-            # See if there is a new max stock prize
-            if combined_data[i][STOCK_PRICE] > max_stock_price:
-                max_stock_price = combined_data[i][STOCK_PRICE]
-
-            if combined_data[i][DAY] > max_day:
-                max_day = combined_data[i][DAY]
-
-            if combined_data[i][SENTIMENT] > max_sentiment_analysis:
-                max_sentiment_analysis = combined_data[i][SENTIMENT]
-
-            if combined_data[i][M1] > max_m1:
-                max_m1 = combined_data[i][M1]
-
-            if combined_data[i][M2] > max_m2:
-                max_m2 = combined_data[i][M2]
-            # To compare the current stock with previous stock
-            # previous = combined_data[i]
         normalized = []
 
         for s in combined_data:
@@ -140,32 +111,28 @@ class Predictor:
                 s[M2] / max_m2,  # m2
                 s[M3],  # m3
                 s[M4],  # m4
-                s[SEGMENT],  # market_segment
-                s[TREND],  # trend
 
             )
             normalized.append(replace)
 
         return normalized
 
-
-
     def normalize(self, info_company, info_quarter, info_daily, current_stock_price):
         # INDEX VALUES FOR VARIOUS DATA
-        COMPANY_NAME    = 0
-        YEAR            = 1
-        DAY             = 2
-        QUARTER         = 3
-        STOCK_PRICE     = 4
-        EXPERT_1        = 5
-                        # EXPERT_2 index not used, skip
-        SENTIMENT       = 7
-        M1              = 8
-        M2              = 9
-        M3              = 10
-        M4              = 11
-        SEGMENT         = 12
-        TREND           = 13
+        COMPANY_NAME = 0
+        YEAR = 1
+        DAY = 2
+        QUARTER = 3
+        STOCK_PRICE = 4
+        EXPERT_1 = 5
+        # EXPERT_2 index not used, skip
+        SENTIMENT = 7
+        M1 = 8
+        M2 = 9
+        M3 = 10
+        M4 = 11
+        SEGMENT = 12
+        TREND = 13
 
         combined_data = []
 
@@ -244,19 +211,19 @@ class Predictor:
 
         for s in combined_data:
             replace = (
-                s[COMPANY_NAME],                    # company name
-                s[YEAR],                            # year
-                s[DAY] / max_day,                   # day
-                s[QUARTER],                         # quarter
-                s[STOCK_PRICE] / max_stock_price,   # stock price
-                s[EXPERT_1],                        # expert 1
-                s[SENTIMENT] / max_sentiment_analysis,# sentiment analysis
-                s[M1] / max_m1,                     # m1
-                s[M2] / max_m2,                     # m2
-                s[M3],                              # m3
-                s[M4],                              # m4
-                s[SEGMENT],                         # market_segment
-                s[TREND],                           # trend
+                s[COMPANY_NAME],  # company name
+                s[YEAR],  # year
+                s[DAY] / max_day,  # day
+                s[QUARTER],  # quarter
+                s[STOCK_PRICE] / max_stock_price,  # stock price
+                s[EXPERT_1],  # expert 1
+                s[SENTIMENT] / max_sentiment_analysis,  # sentiment analysis
+                s[M1] / max_m1,  # m1
+                s[M2] / max_m2,  # m2
+                s[M3],  # m3
+                s[M4],  # m4
+                s[SEGMENT],  # market_segment
+                s[TREND],  # trend
 
             )
             normalized.append(replace)
@@ -304,7 +271,6 @@ class Predictor:
                 total += 1
         print("Accuracy: ", round(correct / total, 3))
 
-
     def predict(self, info_company, info_quarter, info_daily, current_stock_price):
         """
         Predict, based on the most recent information, the development of the stock-prices for companies 0-2.
@@ -323,7 +289,7 @@ class Predictor:
         BATCH_SIZE = 10
         # train_set, test_set, feature_size = self.split_data(normalized, target_label, BATCH_SIZE)
 
-        WIDTH = 64  # The width of the layers
+        WIDTH = 56  # The width of the layers
         IN_FEATURES = np.array(normalized).shape[1]  # The amount of data coming in [x, y, z, a]
         OUT_FEATURES = 2  # Number of possible answers [0, 1]
         EPOCHS_VAL = 90
@@ -331,16 +297,19 @@ class Predictor:
         DROPOUT_VALUE = 0.375
 
         cross_net = model.MyANN(DROPOUT_VALUE, IN_FEATURES, WIDTH, OUT_FEATURES)
-        cross_net._load_state_dict(torch.load('cross_network_0.915'))
-        # X, y = torch.Tensor(normalized), torch.Tensor(?)
-        cross_net.eval()
-        # for data in test_set:
-        #     _X, _y = data
-        #     output = net(_X)  # Forward pass
-        #     for idx, val in enumerate(output):
-        #         if torch.argmax(val) == _y[idx]:
-        #             correct += 1
-        #         total += 1
-        # train_test_split(cross_net, LEARNING_RATE, EPOCHS_VAL, train_set, test_set)
+        cross_net.load_state_dict(torch.load('models/nll_network_0911.pt'))
 
-        return False, False, False
+        answers = []
+
+        for i in range(len(normalized)):
+            X = torch.Tensor(normalized[i])
+            cross_net.eval()
+            output = cross_net(X)
+            prediction = torch.argmax(output)
+            print(prediction)
+            if prediction == 0:
+                answers.append(False)
+            else:
+                answers.append(True)
+
+        return answers[0], answers[1], answers[2]
