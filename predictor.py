@@ -111,7 +111,6 @@ class Predictor:
                 s[M2] / max_m2,  # m2
                 s[M3],  # m3
                 s[M4],  # m4
-
             )
             normalized.append(replace)
 
